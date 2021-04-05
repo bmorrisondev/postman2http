@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -32,7 +33,11 @@ func main() {
 	// create an out string
 	outString := ""
 	for idx, item := range collection.Items {
-		outString += item.Request.Method + " " + item.Request.Url.Raw + "\n"
+		url := item.Request.Url.Raw
+		if !strings.HasPrefix(url, "http") {
+			url = "http://" + url
+		}
+		outString += item.Request.Method + " " + url + "\n"
 		for _, header := range item.Request.Headers {
 			outString += header.Key + ": " + header.Value + "\n"
 		}
@@ -66,40 +71,4 @@ func main() {
 	// 		return
 	// }
 
-}
-
-type PostmanCollection struct {
-	Info  Info   `json:"info"`
-	Items []Item `json:"item"`
-}
-
-type Info struct {
-	PostmanId string `json:"_postman_id"`
-	Name      string `json:"name"`
-	Schema    string `json:"schema"`
-}
-
-type Item struct {
-	Name    string  `json:"name"`
-	Request Request `json:"request"`
-}
-
-type Request struct {
-	Method  string   `json:"method"`
-	Headers []Header `json:"header"`
-	Url     Url      `json:"url"`
-	Body    Body     `json:"body"`
-}
-
-type Header struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
-}
-
-type Url struct {
-	Raw string `json:"raw"`
-}
-
-type Body struct {
-	Raw string `json:"raw"`
 }
